@@ -1,21 +1,45 @@
-name: Run Tests
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - name: Install dependencies
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-      - name: Run tests
-        run: |
-          source venv/bin/activate
-          pytest
+# 3. Добавление матрицы версий Python
+strategy:
+  matrix:
+    python-version: ['3.9', '3.10', '3.11']
+
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v3
+
+  # Подставляем версию Python из матрицы
+  - name: Set up Python ${{ matrix.python-version }}
+    uses: actions/setup-python@v4
+    with:
+      python-version: ${{ matrix.python-version }}
+
+  - name: Install dependencies
+    run: |
+      python -m venv venv
+      source venv/bin/activate
+      pip install -r requirements.txt
+      pip install flake8 # 1. Устанавливаем линтер
+
+  - name: Run linter (flake8)
+    run: |
+      source venv/bin/activate
+      # 1. Запускаем линтер. Исключаем папку venv, чтобы он не проверял чужой код
+      flake8 . --exclude=venv
+
+  - name: Run tests
+    run: |
+      source venv/bin/activate
+      pytest
+
+  # 2. Уведомление в Telegram (сработает только если шаг flake8 или pytest упадет)
+  - name: Send Telegram Notification on Failure
+    if: failure()
+    uses: appleboy/telegram-action@master
+    with:
+      to: ${{ secrets.TELEGRAM_CHAT_ID }}
+      token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      message: |
+        Ошибка в CI/CD навигации!
+        Репозиторий: ${{ github.repository }}
+        Версия Python: ${{ matrix.python-version }}
+        Посмотреть логи: https://github.com/${{ github.repository }}/actions
