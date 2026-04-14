@@ -1,0 +1,52 @@
+# --- Python bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual environments ---
+.venv/
+venv/
+ENV/
+env/
+bin/
+include/
+lib/
+lib64/
+
+# --- IDE/Editor files ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- Distribution / Packaging ---
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Data/Logs/Temp ---
+*.log
+*.tmp
+*.csv
+*.json
+.ipynb_checkpoints
+
+# --- Secret/Env files ---
+.env
+.env.local
+.secrets
+
+# --- Jupyter Notebook ---
+.ipynb_checkpoints/
